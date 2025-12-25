@@ -1,0 +1,116 @@
+.addlink-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #F8FAFC;
+  border-radius: 12px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.addlink-container h2 {
+  color: #1E293B;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+/* Ensure every form control sits on its own line and fills width */
+.bookmark-form {
+  display: block;
+}
+
+.bookmark-form input,
+.bookmark-form textarea {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #E2E8F0;
+  background: #ffffff;
+  box-sizing: border-box;
+  font-size: 14px;
+  color: #0F172A;
+}
+
+/* Textarea specific UI */
+.bookmark-form textarea {
+  min-height: 100px;     /* visible multi-line area */
+  resize: vertical;      /* user can resize vertically only */
+  line-height: 1.4;
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+}
+
+/* Focus state for accessibility */
+.bookmark-form input:focus,
+.bookmark-form textarea:focus {
+  outline: none;
+  border-color: #2563EB;
+  box-shadow: 0 0 6px rgba(37, 99, 235, 0.12);
+}
+
+/* Submit button */
+.bookmark-form button {
+  width: 100%;
+  padding: 0.6rem;
+  background: #2563EB;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.bookmark-form button:hover {
+  background: #1D4ED8;
+}
+
+
+/* Category Dropdown */
+/* Category Dropdown - consistent with other inputs */
+.category-select {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #E2E8F0;
+  background: #ffffff; /* same as input fields */
+  box-sizing: border-box;
+  font-size: 14px;
+  color: #0F172A;
+  font-family: 'Roboto', sans-serif;
+  transition: all 0.2s ease;
+}
+
+.category-select:focus {
+  outline: none;
+  border-color: #2563EB;
+  box-shadow: 0 0 6px rgba(37, 99, 235, 0.12);
+}
+
+.category-select option {
+  background: #ffffff;
+  color: #0F172A;
+}
+
+
+/* Messages */
+.message-error { color: #EF4444; margin-bottom: 1rem; }
+.message-success { color: #10B981; margin-bottom: 1rem; }
+
+/* Responsive small screens */
+@media (max-width: 520px) {
+  .addlink-container {
+    padding: 1.25rem;
+  }
+
+  .bookmark-form input,
+  .bookmark-form textarea,
+  .bookmark-form button {
+    font-size: 14px;
+  }
+}
+
+

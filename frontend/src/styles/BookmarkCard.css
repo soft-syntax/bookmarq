@@ -1,0 +1,62 @@
+.bookmark-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.bookmark-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.bookmark-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.bookmark-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.bookmark-info {
+  padding: 1rem;
+}
+
+.bookmark-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
+}
+
+.bookmark-favicon {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+}
+
+.bookmark-header h3 {
+  font-size: 1.1rem;
+  color: #1E293B;
+  margin: 0;
+}
+
+.bookmark-desc {
+  font-size: 0.95rem;
+  color: #475569;
+  margin-bottom: 0.8rem;
+}
+
+.bookmark-tags span {
+  background: #EEF2FF;
+  color: #4F46E5;
+  font-size: 0.8rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-right: 5px;
+}

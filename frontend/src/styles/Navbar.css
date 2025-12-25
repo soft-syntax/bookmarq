@@ -1,0 +1,134 @@
+/* Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;700&family=Roboto:wght@400;500&display=swap');
+
+/* Navbar container */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #F8FAFC; /* Light background */
+  font-family: 'Roboto', sans-serif;
+  border-bottom: 1px solid #E2E8F0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* Logo container */
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+/* Logo image */
+.navbar-logo-img {
+  height: 50px; /* increased size for visibility */
+  width: auto;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+/* Logo text */
+.navbar-logo-text {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem; /* slightly larger */
+  color: #2563EB; /* Primary blue */
+  vertical-align: middle;
+}
+
+.navbar-logo:hover .navbar-logo-text {
+  color: #FACC15; /* Accent yellow */
+  text-shadow: 0 0 6px #FACC15;
+}
+
+/* Right side buttons container */
+.navbar-right {
+  display: flex;
+  align-items: center;
+}
+
+/* Generic button styling */
+.navbar-right .btn {
+  margin-left: 1rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: 600;
+  text-decoration: none;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+}
+
+/* Login button */
+.login-btn {
+  background-color: #2563EB; /* Blue */
+  color: #FFFFFF;
+}
+.login-btn:hover {
+  background-color: #1D4ED8;
+  box-shadow: 0 0 8px #2563EB;
+}
+
+/* Register button */
+.register-btn {
+  background-color: #FACC15; /* Yellow */
+  color: #0F172A;
+}
+.register-btn:hover {
+  background-color: #EAB308;
+  box-shadow: 0 0 8px #FACC15;
+}
+
+/* Logout button */
+.logout-btn {
+  background-color: #EF4444; /* Red */
+  color: #FFFFFF;
+}
+.logout-btn:hover {
+  background-color: #B91C1C;
+  box-shadow: 0 0 8px #EF4444;
+}
+
+/* Dashboard button */
+.dashboard-btn {
+  background-color: #2563EB; /* Same as login for consistency */
+  color: #FFFFFF;
+}
+.dashboard-btn:hover {
+  background-color: #1D4ED8;
+  box-shadow: 0 0 8px #2563EB;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .navbar-right {
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .navbar-right .btn {
+    margin-left: 0;
+    margin-right: 0.5rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .navbar-logo-text {
+    font-size: 1.2rem; /* smaller text on mobile */
+  }
+
+  .navbar-logo-img {
+    height: 40px; /* smaller logo on mobile */
+  }
+}

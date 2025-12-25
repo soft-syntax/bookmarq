@@ -1,0 +1,108 @@
+/* src/styles/Home.css */
+
+.home-container {
+  font-family: 'Poppins', sans-serif;
+  color: #1e293b;
+  overflow-x: hidden;
+}
+
+/* ===== HERO SECTION ===== */
+.hero-section {
+  position: relative;
+  background: radial-gradient(circle at top right, rgba(30, 58, 138, 0.85), rgba(30, 64, 175, 0.85));
+  color: #fff;
+  padding: 5rem 1rem 6rem;
+  text-align: center;
+  border-radius: 0 0 2rem 2rem;
+  overflow: hidden;
+}
+
+
+/* Text content */
+.hero-content {
+  max-width: 700px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-icon {
+  color: #facc15;
+  margin-bottom: 1rem;
+}
+
+.hero-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+  font-size: 1.1rem;
+  color: #e2e8f0;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.hero-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #facc15;
+  color: #1e293b;
+  padding: 0.7rem 1.4rem;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hero-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== BOOKMARKS SECTION ===== */
+.bookmarks-section {
+  max-width: 1200px;
+  margin: 3rem auto;
+  padding: 0 1.2rem;
+  position: relative;
+  z-index: 3;
+}
+
+.home-heading {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #1e293b;
+  text-align: center;
+  margin-bottom: 0.4rem;
+}
+
+.home-subtext {
+  text-align: center;
+  color: #64748b;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+.bookmark-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.6rem;
+}
+
+/* Mobile tweaks */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 1.8rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+
+  .hero-btn {
+    padding: 0.6rem 1.2rem;
+  }
+}
