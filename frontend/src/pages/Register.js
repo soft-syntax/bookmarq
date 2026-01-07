@@ -1,6 +1,5 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
 import API from "../utils/api";
 import "../styles/Auth.css";
 
@@ -10,30 +9,35 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const { setToken } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const res = await API.post("/auth/register", { name, email, password });
       setSuccess(res.data.message);
-      // Optional: login immediately after register
-      const loginRes = await API.post("/auth/login", { email, password });
-      setToken(loginRes.data.token);
-      navigate("/dashboard");
+      setError("");
+
+      navigate("/verify", { state: { email } });
     } catch (err) {
+      setSuccess("");
       setError(err.response?.data?.message || "Registration failed");
       setTimeout(() => setError(""), 3000);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="auth-container">
       <h2>Register</h2>
+
       {error && <p className="message-error">{error}</p>}
       {success && <p className="message-success">{success}</p>}
+
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -56,7 +60,9 @@ const Register = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button type="submit">Register</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Creating account..." : "Register"}
+        </button>
       </form>
     </div>
   );

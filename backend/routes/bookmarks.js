@@ -4,121 +4,190 @@ import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// --------------------
-// Public: Get all bookmarks
-// --------------------
+/*
+|--------------------------------------------------------------------------
+| Public: Get all bookmarks (Home page) with pagination
+|--------------------------------------------------------------------------
+*/
 router.get("/", async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
     const bookmarks = await Bookmark.find()
       .populate("user", "name")
-      .populate("category", "name") // include category info
-      .sort({ createdAt: -1 });
+      .populate("category", "name")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
-    res.json(bookmarks);
-  } catch (err) {
-    res.status(500).json({ message: "Server error", error: err.message });
-  }
-});
+    const total = await Bookmark.countDocuments();
 
-// --------------------
-// Public: Get single bookmark by ID
-// --------------------
-router.get("/:id", async (req, res) => {
-  try {
-    const bookmark = await Bookmark.findById(req.params.id)
-      .populate("user", "name")
-      .populate("category", "name");
-
-    if (!bookmark)
-      return res.status(404).json({ message: "Bookmark not found" });
-
-    res.json(bookmark);
-  } catch (err) {
-    res.status(500).json({ message: "Error fetching bookmark", error: err.message });
-  }
-});
-
-// --------------------
-// Protected: Add new bookmark
-// --------------------
-router.post("/", authMiddleware, async (req, res) => {
-  try {
-    const { title, url, description, featuredImage, tags, category } = req.body;
-    const userId = req.user.id;
-
-    const newBookmark = new Bookmark({
-      title,
-      url,
-      description,
-      featuredImage: featuredImage || "",
-      tags: tags?.map((t) => t.trim()).filter(Boolean) || [],
-      category: category || null, // new field for category
-      user: userId,
+    res.json({
+      bookmarks,
+      total,
+      page,
+      pages: Math.ceil(total / limit),
     });
-
-    await newBookmark.save();
-    await newBookmark.populate("user", "name");
-    await newBookmark.populate("category", "name");
-
-    res.status(201).json(newBookmark);
   } catch (err) {
-    res.status(500).json({ message: "Failed to add bookmark", error: err.message });
+    console.error("Fetch bookmarks error:", err);
+    res.status(500).json({
+      message: "Could not load bookmarks. Please try again.",
+    });
   }
 });
 
-// --------------------
-// Protected: Update bookmark
-// --------------------
-router.put("/:id", authMiddleware, async (req, res) => {
-  try {
-    const { title, url, description, featuredImage, tags, category } = req.body;
-
-    const updatedBookmark = await Bookmark.findByIdAndUpdate(
-      req.params.id,
-      {
-        title,
-        url,
-        description,
-        featuredImage: featuredImage || "",
-        tags: tags?.map((t) => t.trim()).filter(Boolean) || [],
-        category: category || null,
-      },
-      { new: true }
-    )
-      .populate("user", "name")
-      .populate("category", "name");
-
-    res.json(updatedBookmark);
-  } catch (err) {
-    res.status(500).json({ message: "Failed to update bookmark", error: err.message });
-  }
-});
-
-// --------------------
-// Protected: Delete bookmark
-// --------------------
-router.delete("/:id", authMiddleware, async (req, res) => {
-  try {
-    await Bookmark.findByIdAndDelete(req.params.id);
-    res.json({ message: "Bookmark deleted" });
-  } catch (err) {
-    res.status(500).json({ message: "Failed to delete bookmark", error: err.message });
-  }
-});
-
-// --------------------
-// Public: Get bookmarks by category
-// --------------------
+/*
+|--------------------------------------------------------------------------
+| Public: Get bookmarks by category
+|--------------------------------------------------------------------------
+| IMPORTANT: must be before "/:id"
+*/
 router.get("/category/:categoryId", async (req, res) => {
   try {
-    const bookmarks = await Bookmark.find({ category: req.params.categoryId })
+    const bookmarks = await Bookmark.find({
+      category: req.params.categoryId,
+    })
       .populate("user", "name")
       .populate("category", "name")
       .sort({ createdAt: -1 });
 
     res.json(bookmarks);
   } catch (err) {
-    res.status(500).json({ message: "Error fetching category bookmarks", error: err.message });
+    console.error("Fetch category bookmarks error:", err);
+    res.status(500).json({
+      message: "Could not load category bookmarks.",
+    });
+  }
+});
+
+/*
+|--------------------------------------------------------------------------
+| Public: Get single bookmark
+|--------------------------------------------------------------------------
+*/
+router.get("/:id", async (req, res) => {
+  try {
+    const bookmark = await Bookmark.findById(req.params.id)
+      .populate("user", "name")
+      .populate("category", "name");
+
+    if (!bookmark) {
+      return res.status(404).json({ message: "Bookmark not found" });
+    }
+
+    res.json(bookmark);
+  } catch (err) {
+    console.error("Fetch single bookmark error:", err);
+    res.status(500).json({
+      message: "Could not load bookmark.",
+    });
+  }
+});
+
+/*
+|--------------------------------------------------------------------------
+| Protected: Add bookmark
+|--------------------------------------------------------------------------
+*/
+router.post("/", authMiddleware, async (req, res) => {
+  try {
+    const { title, url, description, featuredImage, tags, category } = req.body;
+
+    const newBookmark = new Bookmark({
+      title,
+      url,
+      description,
+      featuredImage: featuredImage || "",
+      tags: tags?.map(t => t.trim()).filter(Boolean) || [],
+      category: category || null,
+      user: req.user.id,
+    });
+
+    await newBookmark.save();
+
+    await newBookmark.populate([
+      { path: "user", select: "name" },
+      { path: "category", select: "name" },
+    ]);
+
+    res.status(201).json(newBookmark);
+  } catch (err) {
+    console.error("Add bookmark error:", err);
+    res.status(500).json({
+      message: "Could not add bookmark. Please try again.",
+    });
+  }
+});
+
+/*
+|--------------------------------------------------------------------------
+| Protected: Update bookmark (OWNER ONLY)
+|--------------------------------------------------------------------------
+*/
+router.put("/:id", authMiddleware, async (req, res) => {
+  try {
+    const bookmark = await Bookmark.findById(req.params.id);
+
+    if (!bookmark) {
+      return res.status(404).json({ message: "Bookmark not found" });
+    }
+
+    if (bookmark.user.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    const { title, url, description, featuredImage, tags, category } = req.body;
+
+    bookmark.title = title;
+    bookmark.url = url;
+    bookmark.description = description;
+    bookmark.featuredImage = featuredImage || "";
+    bookmark.tags = tags?.map(t => t.trim()).filter(Boolean) || [];
+    bookmark.category = category || null;
+
+    await bookmark.save();
+
+    await bookmark.populate([
+      { path: "user", select: "name" },
+      { path: "category", select: "name" },
+    ]);
+
+    res.json(bookmark);
+  } catch (err) {
+    console.error("Update bookmark error:", err);
+    res.status(500).json({
+      message: "Could not update bookmark. Please try again.",
+    });
+  }
+});
+
+/*
+|--------------------------------------------------------------------------
+| Protected: Delete bookmark (OWNER ONLY)
+|--------------------------------------------------------------------------
+*/
+router.delete("/:id", authMiddleware, async (req, res) => {
+  try {
+    const bookmark = await Bookmark.findById(req.params.id);
+
+    if (!bookmark) {
+      return res.status(404).json({ message: "Bookmark not found" });
+    }
+
+    if (bookmark.user.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    await bookmark.deleteOne();
+
+    res.json({ message: "Bookmark deleted" });
+  } catch (err) {
+    console.error("Delete bookmark error:", err);
+    res.status(500).json({
+      message: "Could not delete bookmark. Please try again.",
+    });
   }
 });
 

@@ -22,7 +22,7 @@ const Privacy = () => {
       <h2>Contact Us</h2>
       <p>
         If you have privacy-related questions, contact us at{" "}
-        <a href="mailto:support@bookmarq.xyz">support@yourdomain.com</a>.
+        <a href="mailto:support@bookmarq.xyz">support@bookmarq.xyz</a>.
       </p>
     </div>
   );

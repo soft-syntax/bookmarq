@@ -7,14 +7,15 @@ import { Link } from "react-router-dom";
 import { Plus, Bookmark } from "lucide-react";
 
 const Home = () => {
-  const [bookmarks, setBookmarks] = useState([]);
+  const [bookmarks, setBookmarks] = useState({ bookmarks: [], total: 0, page: 1, pages: 0 });
+
   const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchBookmarks = async () => {
       try {
         const res = await API.get("/bookmarks");
-        setBookmarks(res.data);
+        setBookmarks(res.data.bookmarks);
       } catch (err) {
         console.error("Failed to load bookmarks", err);
       }
@@ -38,7 +39,7 @@ const Home = () => {
 
           <Link to={token ? "/add-link" : "/login"} className="hero-btn">
             <Plus size={18} />
-            {token ? "Add Your Bookmark" : "Get Started"}
+            {token ? "Add Your Bookmark" : "Add Bookmark"}
           </Link>
         </div>
       </section>
@@ -48,14 +49,17 @@ const Home = () => {
       <section className="bookmarks-section">
         <h2 className="home-heading">Explore Recent Bookmarks</h2>
         <p className="home-subtext">
-          Browse the latest shared links — from tech, design, and creativity.
+          Browse the latest shared links!...
         </p>
 
         <div className="bookmark-grid">
-          {bookmarks.map((bookmark) => (
-            <BookmarkCard key={bookmark._id} bookmark={bookmark} />
-          ))}
+          {Array.isArray(bookmarks) &&
+            bookmarks.map((bookmark) => (
+              <BookmarkCard key={bookmark._id} bookmark={bookmark} />
+            ))}
         </div>
+
+
       </section>
     </div>
   );
