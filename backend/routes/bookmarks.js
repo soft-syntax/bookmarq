@@ -64,6 +64,29 @@ router.get("/category/:categoryId", async (req, res) => {
 
 /*
 |--------------------------------------------------------------------------
+| Protected: Get current user's bookmarks
+|--------------------------------------------------------------------------
+*/
+router.get("/mine", authMiddleware, async (req, res) => {
+  try {
+    const bookmarks = await Bookmark.find({
+      user: req.user.id,
+    })
+      .populate("user", "name")
+      .populate("category", "name")
+      .sort({ createdAt: -1 });
+
+    res.json(bookmarks);
+  } catch (err) {
+    console.error("Fetch user bookmarks error:", err);
+    res.status(500).json({
+      message: "Could not load your bookmarks.",
+    });
+  }
+});
+
+/*
+|--------------------------------------------------------------------------
 | Public: Get single bookmark
 |--------------------------------------------------------------------------
 */
