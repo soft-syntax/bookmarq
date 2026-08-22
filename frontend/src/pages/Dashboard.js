@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
-import API from "../utils/api";
+import API, { getCategories } from "../utils/api";
 import "../styles/Dashboard.css";
 
 const Dashboard = () => {
   const [bookmarks, setBookmarks] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [newBookmark, setNewBookmark] = useState({
     title: "",
     url: "",
     description: "",
     featuredImage: "",
+    category: "",
     tags: "",
   });
   const [editingBookmark, setEditingBookmark] = useState(null);
@@ -21,8 +23,10 @@ const Dashboard = () => {
 
   useEffect(() => {
   if (token) {
-      fetchBookmarks();
-    }
+    fetchBookmarks();
+  }
+
+  fetchCategories();
   }, [token]);
 
   const fetchBookmarks = async () => {
@@ -34,6 +38,14 @@ const Dashboard = () => {
       setTimeout(() => setError(""), 3000);
     }
   };
+  const fetchCategories = async () => {
+  try {
+    const data = await getCategories();
+    setCategories(data);
+  } catch (err) {
+    console.error("Failed to load categories", err);
+  }
+};
 
   const handleChange = (e) => {
     setNewBookmark({ ...newBookmark, [e.target.name]: e.target.value });
@@ -51,7 +63,7 @@ const Dashboard = () => {
         tags: newBookmark.tags.split(",").map((t) => t.trim()).filter(Boolean),
       };
       await API.post("/bookmarks", payload);
-      setNewBookmark({ title: "", url: "", description: "", featuredImage: "", tags: "" });
+      setNewBookmark({ title: "", url: "", description: "", featuredImage: "", category: "", tags: "" });
       setSuccess("Bookmark added successfully!");
       fetchBookmarks();
       setTimeout(() => setSuccess(""), 3000);
@@ -75,7 +87,12 @@ const Dashboard = () => {
 
   const startEditing = (bookmark) => {
     setEditingBookmark(bookmark._id);
-    setEditedBookmark({ ...bookmark, tags: bookmark.tags.join(", ") });
+
+    setEditedBookmark({
+      ...bookmark,
+      category: bookmark.category?._id || "",
+      tags: bookmark.tags.join(", "),
+    });
   };
 
   const saveEdit = async (id) => {
@@ -125,6 +142,19 @@ const Dashboard = () => {
             value={newBookmark.description}
             onChange={handleChange}
           />
+          <select
+            name="category"
+            value={newBookmark.category}
+            onChange={handleChange}
+          >
+          <option value="">Select Category</option>
+
+            {categories.map((category) => (
+            <option key={category._id} value={category._id}>
+            {category.name}
+          </option>
+            ))}
+          </select>
           <input
             type="url"
             name="featuredImage"
@@ -172,6 +202,20 @@ const Dashboard = () => {
                   onChange={handleEditChange}
                   placeholder="Description"
                 />
+               <select
+                  name="category"
+                  value={editedBookmark.category || ""}
+                  onChange={handleEditChange}
+                >
+                  <option value="">Select Category</option>
+
+                  {categories.map((category) => (
+                    <option key={category._id} value={category._id}>
+                      {category.name}
+                    </option>
+                    ))}
+                </select>
+                 
                 <input
                   type="url"
                   name="featuredImage"
