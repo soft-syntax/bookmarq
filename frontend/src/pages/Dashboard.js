@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import API, { getCategories } from "../utils/api";
 import "../styles/Dashboard.css";
+// updated
 
 const Dashboard = () => {
   const [bookmarks, setBookmarks] = useState([]);
@@ -22,11 +23,11 @@ const Dashboard = () => {
   const canEdit = !!token;
 
   useEffect(() => {
-  if (token) {
-    fetchBookmarks();
-  }
+    if (token) {
+      fetchBookmarks();
+    }
 
-  fetchCategories();
+    fetchCategories();
   }, [token]);
 
   const fetchBookmarks = async () => {
@@ -39,13 +40,13 @@ const Dashboard = () => {
     }
   };
   const fetchCategories = async () => {
-  try {
-    const data = await getCategories();
-    setCategories(data);
-  } catch (err) {
-    console.error("Failed to load categories", err);
-  }
-};
+    try {
+      const data = await getCategories();
+      setCategories(data);
+    } catch (err) {
+      console.error("Failed to load categories", err);
+    }
+  };
 
   const handleChange = (e) => {
     setNewBookmark({ ...newBookmark, [e.target.name]: e.target.value });
@@ -147,12 +148,12 @@ const Dashboard = () => {
             value={newBookmark.category}
             onChange={handleChange}
           >
-          <option value="">Select Category</option>
+            <option value="">Select Category</option>
 
             {categories.map((category) => (
-            <option key={category._id} value={category._id}>
-            {category.name}
-          </option>
+              <option key={category._id} value={category._id}>
+                {category.name}
+              </option>
             ))}
           </select>
           <input
@@ -202,7 +203,7 @@ const Dashboard = () => {
                   onChange={handleEditChange}
                   placeholder="Description"
                 />
-               <select
+                <select
                   name="category"
                   value={editedBookmark.category || ""}
                   onChange={handleEditChange}
@@ -213,9 +214,9 @@ const Dashboard = () => {
                     <option key={category._id} value={category._id}>
                       {category.name}
                     </option>
-                    ))}
+                  ))}
                 </select>
-                 
+
                 <input
                   type="url"
                   name="featuredImage"
