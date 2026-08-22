@@ -20,8 +20,10 @@ const Dashboard = () => {
   const canEdit = !!token;
 
   useEffect(() => {
-    fetchBookmarks();
-  }, []);
+  if (token) {
+      fetchBookmarks();
+    }
+  }, [token]);
 
   const fetchBookmarks = async () => {
     try {
