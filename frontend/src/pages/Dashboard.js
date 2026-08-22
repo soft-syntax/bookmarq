@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import API, { getCategories } from "../utils/api";
 import "../styles/Dashboard.css";
-// updated
 
 const Dashboard = () => {
   const [bookmarks, setBookmarks] = useState([]);
