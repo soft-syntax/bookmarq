@@ -26,7 +26,7 @@ const Dashboard = () => {
   const fetchBookmarks = async () => {
     try {
       const res = await API.get("/bookmarks");
-      setBookmarks(res.data);
+      setBookmarks(res.data.bookmarks);
     } catch (err) {
       setError("Failed to load bookmarks");
       setTimeout(() => setError(""), 3000);
