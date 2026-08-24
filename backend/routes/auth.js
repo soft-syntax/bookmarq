@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import { sendEmail } from "../utils/mailer.js";
+import { genNumericOTP } from "../utils/crypto.js";
 
 const router = express.Router();
 
@@ -33,7 +34,7 @@ router.post("/register", async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otp = genNumericOTP();
     const hashedOtp = await bcrypt.hash(otp, 10);
 
     const newUser = new User({
@@ -116,7 +117,7 @@ router.post("/resend-otp", async (req, res) => {
     if (user.isVerified)
       return res.status(400).json({ message: "User already verified" });
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otp = genNumericOTP();
     user.otp = await bcrypt.hash(otp, 10);
     user.otpExpiresAt = Date.now() + 10 * 60 * 1000;
     await user.save();
@@ -187,7 +188,7 @@ router.post("/forgot-password", async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "User not found" });
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otp = genNumericOTP();
     user.otp = await bcrypt.hash(otp, 10);
     user.otpExpiresAt = Date.now() + 10 * 60 * 1000;
     await user.save();

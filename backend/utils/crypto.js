@@ -1,10 +1,14 @@
 import crypto from "crypto";
 
 export const genNumericOTP = (length = 6) => {
-  const digits = "0123456789";
-  let otp = "";
-  for (let i = 0; i < length; i++) otp += digits[Math.floor(Math.random() * 10)];
-  return otp;
+  if (!Number.isInteger(length) || length < 1) {
+    throw new Error("OTP length must be a positive integer");
+  }
+
+  const min = 10 ** (length - 1);
+  const max = 10 ** length;
+
+  return crypto.randomInt(min, max).toString();
 };
 
 export const hashString = (str) => {
