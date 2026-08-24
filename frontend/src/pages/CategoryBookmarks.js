@@ -8,22 +8,36 @@ const CategoryBookmarks = () => {
   const [bookmarks, setBookmarks] = useState([]);
   const [categoryName, setCategoryName] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchBookmarks = async () => {
-      try {
-        const catRes = await API.get(`/categories/${id}`);
-        setCategoryName(catRes.data.name);
+    const fetchData = async () => {
+      setLoading(true);
+      setError("");
 
-        const res = await API.get(`/bookmarks/category/${id}`);
-        setBookmarks(res.data);
-      } catch (err) {
-        console.error("Failed to load bookmarks:", err);
-      } finally {
-        setLoading(false);
+      const [categoryResult, bookmarksResult] = await Promise.allSettled([
+        API.get(`/categories/${id}`),
+        API.get(`/bookmarks/category/${id}`),
+      ]);
+
+      if (categoryResult.status === "fulfilled") {
+        setCategoryName(categoryResult.value.data.name);
+      } else {
+        console.error("Failed to load category:", categoryResult.reason);
+        setCategoryName("Category");
       }
+
+      if (bookmarksResult.status === "fulfilled") {
+        setBookmarks(bookmarksResult.value.data);
+      } else {
+        console.error("Failed to load bookmarks:", bookmarksResult.reason);
+        setError("Could not load bookmarks for this category.");
+      }
+
+      setLoading(false);
     };
-    fetchBookmarks();
+
+    fetchData();
   }, [id]);
 
   if (loading) return <p>Loading bookmarks...</p>;
@@ -31,6 +45,7 @@ const CategoryBookmarks = () => {
   return (
     <div className="category-bookmarks-container">
       <h2>{categoryName} Bookmarks</h2>
+      {error && <p className="message-error">{error}</p>}
       <div className="bookmarks-grid">
         {bookmarks.length === 0 ? (
           <p>No bookmarks in this category yet.</p>
