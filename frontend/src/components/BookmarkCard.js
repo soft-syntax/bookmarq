@@ -2,24 +2,42 @@ import React from "react";
 import "../styles/BookmarkCard.css";
 
 const BookmarkCard = ({ bookmark }) => {
-  const { title, url, description, featuredImage, tags, category } = bookmark;
+  const {
+    title,
+    url,
+    description,
+    featuredImage,
+    tags,
+    category,
+  } = bookmark;
 
   return (
     <div className="bookmark-card">
       {featuredImage && (
-        <img src={featuredImage} alt={title} className="bookmark-image" />
+        <img
+          src={featuredImage}
+          alt={title || "Bookmark"}
+          className="bookmark-image"
+          loading="lazy"
+          onError={(e) => {
+            e.currentTarget.style.display = "none";
+          }}
+        />
       )}
 
       <div className="bookmark-content">
         <h3>
-          <a href={url} target="_blank" rel="noopener noreferrer">
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             {title}
           </a>
         </h3>
 
         {description && <p>{description}</p>}
 
-        {/* ✅ Category Tag */}
         {category && (
           <span
             className="bookmark-category"
@@ -37,11 +55,13 @@ const BookmarkCard = ({ bookmark }) => {
           </span>
         )}
 
-        {/* ✅ Tags */}
-        {tags && tags.length > 0 && (
+        {Array.isArray(tags) && tags.length > 0 && (
           <div className="bookmark-tags">
             {tags.map((tag, index) => (
-              <span key={index} className="tag">
+              <span
+                key={`${tag}-${index}`}
+                className="tag"
+              >
                 #{tag}
               </span>
             ))}

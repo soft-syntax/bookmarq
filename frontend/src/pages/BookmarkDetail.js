@@ -5,27 +5,78 @@ import "../styles/BookmarkDetail.css";
 
 const BookmarkDetail = () => {
   const { id } = useParams();
+
   const [bookmark, setBookmark] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchBookmark = async () => {
+      setLoading(true);
+      setError("");
+      setBookmark(null);
+
+      if (!id) {
+        setError("Invalid bookmark.");
+        setLoading(false);
+        return;
+      }
+
       try {
         const { data } = await API.get(`/bookmarks/${id}`);
+
+        if (!data || typeof data !== "object") {
+          setError("Bookmark not found.");
+          return;
+        }
+
         setBookmark(data);
       } catch (err) {
-        setError("Failed to load bookmark details.");
+        console.error("Failed to load bookmark:", err);
+
+        setError(
+          err?.response?.data?.message ||
+            "Failed to load bookmark details."
+        );
       } finally {
         setLoading(false);
       }
     };
+
     fetchBookmark();
   }, [id]);
 
-  if (loading) return <div className="bookmark-detail-loading">Loading...</div>;
-  if (error) return <div className="bookmark-detail-error">{error}</div>;
-  if (!bookmark) return null;
+  if (loading) {
+    return (
+      <div className="bookmark-detail-loading">
+        Loading...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bookmark-detail-error">
+        <p>{error}</p>
+
+        <Link to="/" className="bookmark-detail-back">
+          ← Back to Home
+        </Link>
+      </div>
+    );
+  }
+
+  if (!bookmark) {
+    return (
+      <div className="bookmark-detail-error">
+        <p>Bookmark not found.</p>
+
+        <Link to="/" className="bookmark-detail-back">
+          ← Back to Home
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="bookmark-detail-container">
@@ -33,25 +84,39 @@ const BookmarkDetail = () => {
         {bookmark.featuredImage && (
           <img
             src={bookmark.featuredImage}
-            alt={bookmark.title}
+            alt={bookmark.title || "Bookmark"}
             className="bookmark-detail-image"
+            loading="lazy"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+            }}
           />
         )}
 
         <div className="bookmark-detail-content">
-          <h2 className="bookmark-detail-title">{bookmark.title}</h2>
-          <p className="bookmark-detail-description">{bookmark.description}</p>
+          <h2 className="bookmark-detail-title">
+            {bookmark.title}
+          </h2>
+
+          {bookmark.description && (
+            <p className="bookmark-detail-description">
+              {bookmark.description}
+            </p>
+          )}
 
           <div className="bookmark-detail-meta">
             <p>
               <strong>Category:</strong>{" "}
               {bookmark.category?.name || "Uncategorized"}
             </p>
-            {bookmark.tags && bookmark.tags.length > 0 && (
-              <p>
-                <strong>Tags:</strong> {bookmark.tags.join(", ")}
-              </p>
-            )}
+
+            {Array.isArray(bookmark.tags) &&
+              bookmark.tags.length > 0 && (
+                <p>
+                  <strong>Tags:</strong>{" "}
+                  {bookmark.tags.join(", ")}
+                </p>
+              )}
           </div>
 
           <a
@@ -63,7 +128,10 @@ const BookmarkDetail = () => {
             Visit Website
           </a>
 
-          <Link to="/" className="bookmark-detail-back">
+          <Link
+            to="/"
+            className="bookmark-detail-back"
+          >
             ← Back to Home
           </Link>
         </div>
