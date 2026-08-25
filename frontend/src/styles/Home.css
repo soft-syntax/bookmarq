@@ -92,6 +92,24 @@
   gap: 1.6rem;
 }
 
+.load-more-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.load-more-btn {
+  padding: 10px 22px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.load-more-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 /* Mobile tweaks */
 @media (max-width: 768px) {
   .hero-title {

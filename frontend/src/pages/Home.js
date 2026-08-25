@@ -12,6 +12,7 @@ const Home = () => {
   const { token } = useContext(AuthContext);
 
   const [bookmarks, setBookmarks] = useState([]);
+
   const [pagination, setPagination] = useState({
     total: 0,
     page: 1,
@@ -19,21 +20,28 @@ const Home = () => {
   });
 
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchBookmarks = async () => {
+    const fetchInitialBookmarks = async () => {
       try {
         setLoading(true);
         setError("");
 
-        const res = await API.get("/bookmarks");
+        const res = await API.get("/bookmarks", {
+          params: {
+            page: 1,
+          },
+        });
 
         const data = res.data;
 
-        setBookmarks(
-          Array.isArray(data?.bookmarks) ? data.bookmarks : []
-        );
+        const initialBookmarks = Array.isArray(data?.bookmarks)
+          ? data.bookmarks
+          : [];
+
+        setBookmarks(initialBookmarks);
 
         setPagination({
           total: Number(data?.total) || 0,
@@ -44,6 +52,7 @@ const Home = () => {
         console.error("Failed to load bookmarks:", err);
 
         setBookmarks([]);
+
         setError(
           err?.response?.data?.message ||
             "Failed to load bookmarks. Please try again."
@@ -53,8 +62,53 @@ const Home = () => {
       }
     };
 
-    fetchBookmarks();
+    fetchInitialBookmarks();
   }, []);
+
+  const loadMore = async () => {
+    if (loadingMore || pagination.page >= pagination.pages) {
+      return;
+    }
+
+    try {
+      setLoadingMore(true);
+      setError("");
+
+      const nextPage = pagination.page + 1;
+
+      const res = await API.get("/bookmarks", {
+        params: {
+          page: nextPage,
+        },
+      });
+
+      const data = res.data;
+
+      const newBookmarks = Array.isArray(data?.bookmarks)
+        ? data.bookmarks
+        : [];
+
+      setBookmarks((currentBookmarks) => [
+        ...currentBookmarks,
+        ...newBookmarks,
+      ]);
+
+      setPagination({
+        total: Number(data?.total) || pagination.total,
+        page: Number(data?.page) || nextPage,
+        pages: Number(data?.pages) || pagination.pages,
+      });
+    } catch (err) {
+      console.error("Failed to load more bookmarks:", err);
+
+      setError(
+        err?.response?.data?.message ||
+          "Failed to load more bookmarks. Please try again."
+      );
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   return (
     <div className="home-container">
@@ -112,7 +166,7 @@ const Home = () => {
           </p>
         )}
 
-        {!loading && !error && bookmarks.length > 0 && (
+        {!loading && bookmarks.length > 0 && (
           <>
             <div className="bookmark-grid">
               {bookmarks.map((bookmark) => (
@@ -123,11 +177,24 @@ const Home = () => {
               ))}
             </div>
 
-            {pagination.total > 0 && (
-              <p className="home-subtext">
-                Showing {bookmarks.length} of{" "}
-                {pagination.total} bookmarks
-              </p>
+            <p className="home-subtext">
+              Showing {bookmarks.length} of{" "}
+              {pagination.total} bookmarks
+            </p>
+
+            {pagination.page < pagination.pages && (
+              <div className="load-more-container">
+                <button
+                  type="button"
+                  className="load-more-btn"
+                  onClick={loadMore}
+                  disabled={loadingMore}
+                >
+                  {loadingMore
+                    ? "Loading..."
+                    : "Load More"}
+                </button>
+              </div>
             )}
           </>
         )}
