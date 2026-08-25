@@ -1,4 +1,5 @@
 import express from "express";
+import mongoose from "mongoose";
 import Category from "../models/Category.js";
 
 const router = express.Router();
@@ -13,17 +14,31 @@ router.get("/", async (req, res) => {
   }
 });
 
-// NEW: Get a single category by ID
+// Get a single category by ID
+
 router.get("/:id", async (req, res) => {
   try {
-    const category = await Category.findById(req.params.id);
-    if (!category) {
-      return res.status(404).json({ message: "Category not found" });
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({
+        message: "Invalid category ID",
+      });
     }
+
+    const category = await Category.findById(req.params.id);
+
+    if (!category) {
+      return res.status(404).json({
+        message: "Category not found",
+      });
+    }
+
     res.json(category);
   } catch (err) {
-    // Malformed ObjectId also lands here — treat as "not found" rather than 500
-    res.status(404).json({ message: "Category not found" });
+    console.error("Fetch category error:", err);
+
+    res.status(500).json({
+      message: "Could not load category.",
+    });
   }
 });
 

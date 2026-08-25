@@ -67,7 +67,7 @@ const ResetPassword = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="New password"
-          minLength={6}
+          minLength={8}
           required
         />
 
