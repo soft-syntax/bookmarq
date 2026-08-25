@@ -16,7 +16,8 @@ const validateRegister = (name, email, password) => {
     return "All fields are required";
   }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\\.[^\s@]+$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 
   if (!emailRegex.test(email)) {
     return "Invalid email format";
@@ -48,7 +49,7 @@ router.post("/register", async (req, res) => {
 
     if (existingUser) {
       return res.status(400).json({
-        message: "User already exists",
+        message: "Could not register with this email. Please try a different one or log in.",
       });
     }
 

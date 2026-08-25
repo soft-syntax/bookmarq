@@ -14,10 +14,10 @@ const Privacy = () => {
         We may collect your email and username during signup or login. No other
         personal data is stored or shared.
       </p>
-      <h2>Cookies</h2>
+      <h2>Authentication & Local Storage</h2>
       <p>
-        We use cookies for authentication and improving your experience. You can
-        clear them anytime from your browser settings.
+        We use browser local storage (not cookies) to keep you signed in. You can
+        clear this anytime by logging out or clearing your browser's site data.
       </p>
       <h2>Contact Us</h2>
       <p>

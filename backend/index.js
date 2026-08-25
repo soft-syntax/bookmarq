@@ -7,6 +7,7 @@ import rateLimit from "express-rate-limit";
 import authRoutes from "./routes/auth.js";
 import bookmarkRoutes from "./routes/bookmarks.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
+import contactRoutes from "./routes/contact.js";
 import connectDB from "./db.js";
 
 dotenv.config();
@@ -87,6 +88,7 @@ app.use(limiter);
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/bookmarks", bookmarkRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/contact", contactRoutes);
 // --------------------
 // Test route
 // --------------------
