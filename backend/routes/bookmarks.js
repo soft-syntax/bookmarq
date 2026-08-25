@@ -6,11 +6,10 @@ import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-/*
-|--------------------------------------------------------------------------
-| Bookmark validation helper
-|--------------------------------------------------------------------------
-*/
+// =============================
+// Bookmark validation helper
+// =============================
+
 const validateBookmarkInput = async ({
   title,
   url,
@@ -21,14 +20,18 @@ const validateBookmarkInput = async ({
 }) => {
   const errors = {};
 
+  // -----------------------------
   // Title
+  // -----------------------------
   if (typeof title !== "string" || !title.trim()) {
     errors.title = "Title is required.";
   } else if (title.trim().length > 200) {
     errors.title = "Title must be 200 characters or less.";
   }
 
+  // -----------------------------
   // URL
+  // -----------------------------
   if (typeof url !== "string" || !url.trim()) {
     errors.url = "URL is required.";
   } else if (url.trim().length > 2048) {
@@ -45,7 +48,9 @@ const validateBookmarkInput = async ({
     }
   }
 
+  // -----------------------------
   // Description
+  // -----------------------------
   if (
     description !== undefined &&
     description !== null &&
@@ -59,7 +64,9 @@ const validateBookmarkInput = async ({
     errors.description = "Description must be 2000 characters or less.";
   }
 
+  // -----------------------------
   // Featured image
+  // -----------------------------
   if (
     featuredImage !== undefined &&
     featuredImage !== null &&
@@ -82,12 +89,15 @@ const validateBookmarkInput = async ({
             "Featured image must use http or https.";
         }
       } catch {
-        errors.featuredImage = "Featured image must be a valid URL.";
+        errors.featuredImage =
+          "Featured image must be a valid URL.";
       }
     }
   }
 
+  // -----------------------------
   // Tags
+  // -----------------------------
   if (tags !== undefined && tags !== null) {
     if (!Array.isArray(tags)) {
       errors.tags = "Tags must be an array.";
@@ -108,12 +118,20 @@ const validateBookmarkInput = async ({
     }
   }
 
+  // -----------------------------
   // Category
-  if (category !== undefined && category !== null && category !== "") {
+  // -----------------------------
+  if (
+    category !== undefined &&
+    category !== null &&
+    category !== ""
+  ) {
     if (!mongoose.Types.ObjectId.isValid(category)) {
       errors.category = "Invalid category.";
     } else {
-      const categoryExists = await Category.exists({ _id: category });
+      const categoryExists = await Category.exists({
+        _id: category,
+      });
 
       if (!categoryExists) {
         errors.category = "Category not found.";
@@ -124,18 +142,24 @@ const validateBookmarkInput = async ({
   return errors;
 };
 
-/*
-|--------------------------------------------------------------------------
-| Public: Get all bookmarks (Home page) with pagination
-|--------------------------------------------------------------------------
-*/
+// =============================
+// Public: Get all bookmarks
+// =============================
+
 router.get("/", async (req, res) => {
   try {
-    const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+    const page = Math.max(
+      parseInt(req.query.page, 10) || 1,
+      1
+    );
 
-    const requestedLimit = parseInt(req.query.limit, 10) || 10;
+    const requestedLimit =
+      parseInt(req.query.limit, 10) || 10;
 
-    const limit = Math.min(Math.max(requestedLimit, 1), 100);
+    const limit = Math.min(
+      Math.max(requestedLimit, 1),
+      100
+    );
 
     const skip = (page - 1) * limit;
 
@@ -163,15 +187,18 @@ router.get("/", async (req, res) => {
   }
 });
 
-/*
-|--------------------------------------------------------------------------
-| Public: Get bookmarks by category
-|--------------------------------------------------------------------------
-| IMPORTANT: must be before "/:id"
-*/
+// =============================
+// Public: Get bookmarks by category
+// IMPORTANT: must be before "/:id"
+// =============================
+
 router.get("/category/:categoryId", async (req, res) => {
   try {
-    if (!mongoose.Types.ObjectId.isValid(req.params.categoryId)) {
+    if (
+      !mongoose.Types.ObjectId.isValid(
+        req.params.categoryId
+      )
+    ) {
       return res.status(400).json({
         message: "Invalid category ID.",
       });
@@ -186,7 +213,10 @@ router.get("/category/:categoryId", async (req, res) => {
 
     res.json(bookmarks);
   } catch (err) {
-    console.error("Fetch category bookmarks error:", err);
+    console.error(
+      "Fetch category bookmarks error:",
+      err
+    );
 
     res.status(500).json({
       message: "Could not load category bookmarks.",
@@ -194,11 +224,10 @@ router.get("/category/:categoryId", async (req, res) => {
   }
 });
 
-/*
-|--------------------------------------------------------------------------
-| Protected: Get current user's bookmarks
-|--------------------------------------------------------------------------
-*/
+// =============================
+// Protected: Get current user's bookmarks
+// =============================
+
 router.get("/mine", authMiddleware, async (req, res) => {
   try {
     const bookmarks = await Bookmark.find({
@@ -210,7 +239,10 @@ router.get("/mine", authMiddleware, async (req, res) => {
 
     res.json(bookmarks);
   } catch (err) {
-    console.error("Fetch user bookmarks error:", err);
+    console.error(
+      "Fetch user bookmarks error:",
+      err
+    );
 
     res.status(500).json({
       message: "Could not load your bookmarks.",
@@ -218,11 +250,10 @@ router.get("/mine", authMiddleware, async (req, res) => {
   }
 });
 
-/*
-|--------------------------------------------------------------------------
-| Public: Get single bookmark
-|--------------------------------------------------------------------------
-*/
+// =============================
+// Public: Get single bookmark
+// =============================
+
 router.get("/:id", async (req, res) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
@@ -231,7 +262,9 @@ router.get("/:id", async (req, res) => {
       });
     }
 
-    const bookmark = await Bookmark.findById(req.params.id)
+    const bookmark = await Bookmark.findById(
+      req.params.id
+    )
       .populate("user", "name")
       .populate("category", "name color");
 
@@ -243,7 +276,10 @@ router.get("/:id", async (req, res) => {
 
     res.json(bookmark);
   } catch (err) {
-    console.error("Fetch single bookmark error:", err);
+    console.error(
+      "Fetch single bookmark error:",
+      err
+    );
 
     res.status(500).json({
       message: "Could not load bookmark.",
@@ -251,13 +287,15 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-/*
-|--------------------------------------------------------------------------
-| Protected: Add bookmark
-|--------------------------------------------------------------------------
-*/
+// =============================
+// Protected: Add bookmark
+// =============================
+
 router.post("/", authMiddleware, async (req, res) => {
   try {
+    // Explicitly extract only allowed fields.
+    // This prevents clients from controlling fields
+    // such as user, _id, createdAt, or updatedAt.
     const {
       title,
       url,
@@ -286,26 +324,40 @@ router.post("/", authMiddleware, async (req, res) => {
     const newBookmark = new Bookmark({
       title: title.trim(),
       url: url.trim(),
+
       description:
         typeof description === "string"
           ? description.trim()
           : "",
+
       featuredImage:
         typeof featuredImage === "string"
           ? featuredImage.trim()
           : "",
+
       tags: Array.isArray(tags)
-        ? tags.map((tag) => tag.trim()).filter(Boolean)
+        ? tags
+            .map((tag) => tag.trim())
+            .filter(Boolean)
         : [],
+
       category: category || null,
+
+      // Always take the user from the verified JWT.
       user: req.user.id,
     });
 
     await newBookmark.save();
 
     await newBookmark.populate([
-      { path: "user", select: "name" },
-      { path: "category", select: "name color" },
+      {
+        path: "user",
+        select: "name",
+      },
+      {
+        path: "category",
+        select: "name color",
+      },
     ]);
 
     res.status(201).json(newBookmark);
@@ -324,11 +376,11 @@ router.post("/", authMiddleware, async (req, res) => {
   }
 });
 
-/*
-|--------------------------------------------------------------------------
-| Protected: Update bookmark (OWNER ONLY)
-|--------------------------------------------------------------------------
-*/
+// =============================
+// Protected: Update bookmark
+// OWNER ONLY
+// =============================
+
 router.put("/:id", authMiddleware, async (req, res) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
@@ -337,7 +389,9 @@ router.put("/:id", authMiddleware, async (req, res) => {
       });
     }
 
-    const bookmark = await Bookmark.findById(req.params.id);
+    const bookmark = await Bookmark.findById(
+      req.params.id
+    );
 
     if (!bookmark) {
       return res.status(404).json({
@@ -345,12 +399,14 @@ router.put("/:id", authMiddleware, async (req, res) => {
       });
     }
 
+    // Ownership check
     if (bookmark.user.toString() !== req.user.id) {
       return res.status(403).json({
         message: "Not authorized",
       });
     }
 
+    // Explicitly extract only editable fields.
     const {
       title,
       url,
@@ -378,24 +434,36 @@ router.put("/:id", authMiddleware, async (req, res) => {
 
     bookmark.title = title.trim();
     bookmark.url = url.trim();
+
     bookmark.description =
       typeof description === "string"
         ? description.trim()
         : "";
+
     bookmark.featuredImage =
       typeof featuredImage === "string"
         ? featuredImage.trim()
         : "";
+
     bookmark.tags = Array.isArray(tags)
-      ? tags.map((tag) => tag.trim()).filter(Boolean)
+      ? tags
+          .map((tag) => tag.trim())
+          .filter(Boolean)
       : [];
+
     bookmark.category = category || null;
 
     await bookmark.save();
 
     await bookmark.populate([
-      { path: "user", select: "name" },
-      { path: "category", select: "name color" },
+      {
+        path: "user",
+        select: "name",
+      },
+      {
+        path: "category",
+        select: "name color",
+      },
     ]);
 
     res.json(bookmark);
@@ -409,50 +477,62 @@ router.put("/:id", authMiddleware, async (req, res) => {
     }
 
     res.status(500).json({
-      message: "Could not update bookmark. Please try again.",
+      message:
+        "Could not update bookmark. Please try again.",
     });
   }
 });
 
-/*
-|--------------------------------------------------------------------------
-| Protected: Delete bookmark (OWNER ONLY)
-|--------------------------------------------------------------------------
-*/
-router.delete("/:id", authMiddleware, async (req, res) => {
-  try {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({
-        message: "Invalid bookmark ID.",
+// =============================
+// Protected: Delete bookmark
+// OWNER ONLY
+// =============================
+
+router.delete(
+  "/:id",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(400).json({
+          message: "Invalid bookmark ID.",
+        });
+      }
+
+      const bookmark = await Bookmark.findById(
+        req.params.id
+      );
+
+      if (!bookmark) {
+        return res.status(404).json({
+          message: "Bookmark not found",
+        });
+      }
+
+      // Ownership check
+      if (bookmark.user.toString() !== req.user.id) {
+        return res.status(403).json({
+          message: "Not authorized",
+        });
+      }
+
+      await bookmark.deleteOne();
+
+      res.json({
+        message: "Bookmark deleted",
+      });
+    } catch (err) {
+      console.error(
+        "Delete bookmark error:",
+        err
+      );
+
+      res.status(500).json({
+        message:
+          "Could not delete bookmark. Please try again.",
       });
     }
-
-    const bookmark = await Bookmark.findById(req.params.id);
-
-    if (!bookmark) {
-      return res.status(404).json({
-        message: "Bookmark not found",
-      });
-    }
-
-    if (bookmark.user.toString() !== req.user.id) {
-      return res.status(403).json({
-        message: "Not authorized",
-      });
-    }
-
-    await bookmark.deleteOne();
-
-    res.json({
-      message: "Bookmark deleted",
-    });
-  } catch (err) {
-    console.error("Delete bookmark error:", err);
-
-    res.status(500).json({
-      message: "Could not delete bookmark. Please try again.",
-    });
   }
-});
+);
 
 export default router;
