@@ -31,7 +31,14 @@ function App() {
         {/* Authentication routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/add-link" element={<AddLink />} />
+        <Route
+          path="/add-link"
+          element={
+            <PrivateRoute>
+              <AddLink />
+            </PrivateRoute>
+          }
+        />
         <Route path="/contact" element={<Contact />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/verify" element={<VerifyEmail />} />
@@ -53,7 +60,7 @@ function App() {
           }
         />
       </Routes>
-     
+
       <Footer />
     </Router>
 

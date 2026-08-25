@@ -1,8 +1,14 @@
 import axios from "axios";
 
 // Backend API base URL — make sure it matches your backend port
+const API_BASE_URL = process.env.REACT_APP_API_URL;
+
+if (!API_BASE_URL) {
+  throw new Error("REACT_APP_API_URL is missing");
+}
+
 const API = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "http://localhost:5000/api",
+  baseURL: API_BASE_URL,
 });
 
 // Attach token with every request if available

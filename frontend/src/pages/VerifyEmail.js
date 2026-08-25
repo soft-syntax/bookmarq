@@ -71,8 +71,11 @@ const VerifyEmail = () => {
         <input
           type="text"
           value={otp}
-          onChange={(e) => setOtp(e.target.value)}
+          onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
           placeholder="Enter OTP"
+          inputMode="numeric"
+          maxLength={6}
+          pattern="[0-9]{6}"
           required
           disabled={loading}
         />

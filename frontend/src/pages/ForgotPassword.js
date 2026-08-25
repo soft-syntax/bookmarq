@@ -15,26 +15,25 @@ const ForgotPassword = () => {
     setLoading(true);
     setMsg("");
 
+    const normalizedEmail = email.trim().toLowerCase();
+
     try {
-      await API.post("/auth/forgot-password", { email });
+      await API.post("/auth/forgot-password", {
+        email: normalizedEmail,
+      });
 
       setMsg("If this email exists, an OTP has been sent.");
 
       setTimeout(() => {
         navigate("/reset-password", {
-          state: { email },
+          state: { email: normalizedEmail },
         });
       }, 800);
     } catch (err) {
-      // Keep the message generic so we don't reveal
-      // whether the email exists in the system.
-      setMsg("If this email exists, an OTP has been sent.");
-
-      setTimeout(() => {
-        navigate("/reset-password", {
-          state: { email },
-        });
-      }, 800);
+      setMsg(
+        err?.response?.data?.message ||
+          "Could not process your request. Please try again later."
+      );
     } finally {
       setLoading(false);
     }
@@ -51,6 +50,7 @@ const ForgotPassword = () => {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Your email"
           required
+          disabled={loading}
         />
 
         <button type="submit" disabled={loading}>

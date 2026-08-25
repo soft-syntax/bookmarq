@@ -17,11 +17,17 @@ const Register = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await API.post("/auth/register", { name, email, password });
+      const normalizedEmail = email.trim().toLowerCase();
+
+      const res = await API.post("/auth/register", {
+        name,
+        email: normalizedEmail,
+        password,
+      });
       setSuccess(res.data.message);
       setError("");
 
-      navigate("/verify", { state: { email } });
+      navigate("/verify", { state: { email: normalizedEmail } });
     } catch (err) {
       setSuccess("");
       setError(err.response?.data?.message || "Registration failed");

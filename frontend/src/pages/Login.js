@@ -9,7 +9,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { setToken } = useContext(AuthContext);
+  const { setToken, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -19,6 +19,7 @@ const Login = () => {
       const res = await API.post("/auth/login", { email, password });
       setError("");            // clear previous errors
       setToken(res.data.token);
+      setUser(res.data.user);
       navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
