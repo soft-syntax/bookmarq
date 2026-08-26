@@ -50,7 +50,7 @@ app.use(
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'"],
         connectSrc: ["'self'", process.env.FRONTEND_URL],
-        imgSrc: ["'self'", "data:"],
+        imgSrc: ["'self'", "data:", "https:"],
       },
     },
   })
