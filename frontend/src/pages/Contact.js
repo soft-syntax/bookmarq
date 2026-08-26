@@ -13,15 +13,31 @@ const Contact = () => {
   // ...
 
   const [status, setStatus] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    setLoading(true);
+    setStatus("");
+
     try {
       await API.post("/contact", formData);
+
       setStatus("Thanks for reaching out! We'll get back to you soon.");
-      setFormData({ name: "", email: "", message: "" });
+
+      setFormData({
+        name: "",
+        email: "",
+        message: "",
+      });
     } catch (err) {
-      setStatus(err.response?.data?.message || "Failed to send message.");
+      setStatus(
+        err.response?.data?.message ||
+        "Failed to send message."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -29,6 +45,8 @@ const Contact = () => {
     <div className="page-container">
       <h1>Contact Us</h1>
       <p>If you have any questions or feedback, fill out the form below.</p>
+      {status && <p className="message-info">{status}</p>}
+
 
       <form className="contact-form" onSubmit={handleSubmit}>
         <input
@@ -55,7 +73,9 @@ const Contact = () => {
           required
         ></textarea>
 
-        <button type="submit">Send Message</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Sending..." : "Send Message"}
+        </button>
       </form>
     </div>
   );
